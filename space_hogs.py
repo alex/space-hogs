@@ -1,30 +1,34 @@
 #!/usr/bin/env python
 
 import pyglet
-
 import settings
 from sprites import Player, Bullet, BULLETS
 
-pyglet.resource.path.append('data')
-pyglet.resource.reindex()
+class SpaceHogs(pyglet.window.Window):
+    def __init__(self):
+        super(SpaceHogs, self).__init__(caption='Space Hogs', width=settings.WINDOW_WIDTH, height=settings.WINDOW_HEIGHT)
+        
+        pyglet.resource.path.append('data')
+        pyglet.resource.reindex()
+        
+        self.batch = pyglet.graphics.Batch()
+        
+        self.player = Player(batch=self.batch)
+        self.push_handlers(self.player)
+        
+        pyglet.clock.schedule_interval(self.update, float(1)/60)
+    
+    def run(self):
+        pyglet.app.run()
+    
+    def update(self, dt):
+        self.player.update(dt)
+        for bullet in BULLETS[:]:
+            bullet.update(dt)
+    
+    def on_draw(self):
+        self.clear()
+        self.batch.draw()
 
-btc = pyglet.graphics.Batch()
-
-
-win = pyglet.window.Window(width=settings.WINDOW_WIDTH, height=settings.WINDOW_HEIGHT)
-ply = Player(batch=btc)
-
-def update(dt):
-    ply.update(dt)
-    for bullet in BULLETS[:]:
-        bullet.update(dt)
-pyglet.clock.schedule_interval(update, float(1)/60)
-
-@win.event
-def on_draw():
-    win.clear()
-    btc.draw()
-
-win.push_handlers(ply)
-
-pyglet.app.run()
+if __name__ == '__main__':
+    SpaceHogs().run()
